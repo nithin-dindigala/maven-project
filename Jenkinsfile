@@ -1,9 +1,16 @@
 pipeline {
     agent any
-    tools {
-        maven 'localMaven'
-    }
-    stages{
+    
+    parameters { 
+         string(name: 'tomcat_dev', defaultValue: '3.86.114.120', description: 'Staging Server')
+         
+    } 
+ 
+    triggers {
+         pollSCM('* * * * *') // Polling Source Control
+     }
+ 
+stages{
         stage('Build'){
             steps {
                 bat 'mvn clean package'
@@ -15,31 +22,17 @@ pipeline {
                 }
             }
         }
-        stage('Deploying to stage'){
-           steps{
-              build job: 'deploy-to-stage'
-           }
-        
-        }
-        stage('Deploying to production'){
-          steps{
-              timeout(time:5,unit:'DAYS'){
-              input message:'Approve Production deployment?'
-              }
-              build job: 'deploy-to-prod'
-          }
-          post{
-            success{
-               echo 'Code deployed to production'
-            
+ 
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        bat "winscp -i /c/Desktop/Cognizant/Jenkins/tomcat-demo.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
+                    }
+                }
+ 
+                
             }
-            failure{
-            
-               echo 'Deployment failed'
-            }
-          
-          }
-        
         }
     }
 }

@@ -32,7 +32,7 @@ stages{
             parallel{
                 stage ('Deploy to Staging'){
                     steps {
-                        bat "winscp -i /c/Desktop/Cognizant/Jenkins/tomcat-demo.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
+                        bat "scp -i /c/Desktop/Cognizant/Jenkins/tomcat-demo.pem **/target/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat7/webapps"
                     }
                 }
  

@@ -3,7 +3,7 @@ pipeline {
     
     tools{
     
-        maven 'local maven'
+        maven 'localMaven'
     }
     
     parameters { 
